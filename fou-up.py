@@ -5,7 +5,15 @@ import sys, os, popen2, csv
 class Positioning:
     def __init__(self, realip = None, intraip = None):
         if realip is None:
-            self.realip = os.popen('curl -s https://ifconfig.co').read().strip()
+            try:
+                fp = file("~/.realip", "r")
+                self.realip = fp.read().strip()
+                fp.close()
+            except IOError:
+                self.realip = os.popen('curl -s https://ifconfig.co').read().strip()
+                fp = file("~/.realip", "w")
+                fp.write("%s\n"%self.realip)
+                fp.close()
         else:
             self.realip = realip
         self.intraip = self.realip
