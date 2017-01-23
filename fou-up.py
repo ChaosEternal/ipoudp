@@ -6,14 +6,17 @@ class Positioning:
     def __init__(self, realip = None, intraip = None):
         if realip is None:
             try:
-                fp = file("~/.realip", "r")
+                fp = file("%s/.realip"%(os.getenv("HOME")), "r")
                 self.realip = fp.read().strip()
                 fp.close()
             except IOError:
                 self.realip = os.popen('curl -s https://ifconfig.co').read().strip()
-                fp = file("~/.realip", "w")
-                fp.write("%s\n"%self.realip)
-                fp.close()
+                try:
+                    fp = file("%s/.realip"%(os.getenv("HOME")), "w")
+                    fp.write("%s\n"%self.realip)
+                    fp.close()
+                except:
+                    pass
         else:
             self.realip = realip
         self.intraip = self.realip
