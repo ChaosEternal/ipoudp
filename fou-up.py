@@ -225,6 +225,14 @@ def links_all_table_parse(links_tbl, links_ports_tbl, links_bridges_tbl, delim =
 def main():
     import sys
     l = {}
+    execfile(sys.argv[1], {}, l)
+    links, links_ports, links_bridges = links_all_table_parse(l["links_tbl"], l["links_ports_tbl"], l["links_bridges_tbl"])
+    links_dict = links_factory(links, links_ports, links_bridges)
+    p = Positioning()
+    print "## === Acting", p.realip, p.intraip
+    for ll in links_dict.values():
+        ll.start_link(p, Monitrc())
+
     
 if __name__ == "__main__":
-    test()
+    main()
