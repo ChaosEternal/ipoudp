@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-import sys, os, popen2, csv
+import sys, os, csv
 
 
 class Positioning:
@@ -232,11 +232,26 @@ def links_all_table_parse(links_tbl, links_ports_tbl, links_bridges_tbl, delim =
     return tuple((map(sns_factory(delim), (x.strip()).split('\n')[1:])
                   for x in (links_tbl, links_ports_tbl, links_bridges_tbl) ))
 
+def orgtables(f):
+    tables = {}
+    tablename = None
+    for l in f.readlines():
+        cl = l.lstrip(' ')
+        if tablename is not None:
+            if cl[0] in ('|', '+'):
+                tables[tablename] += cl
+            else:
+                tablename = None
+        else:
+            if cl[0:7]=="#+NAME:":
+                n=cl.split(":")[1]
+                tablename=n.strip()
+                tables[tablename]=""
+    return tables
 
 def main():
     import sys
-    l = {}
-    execfile(sys.argv[1], {}, l)
+    l = orgtables(open(sys.argv[1]))
     links, links_ports, links_bridges = links_all_table_parse(l["links_tbl"], l["links_ports_tbl"], l["links_bridges_tbl"])
     links_dict = links_factory(links, links_ports, links_bridges)
     p = Positioning()
